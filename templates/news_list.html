@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-panel">
+    <p class="eyebrow">Editorial</p>
+    <h1>Daily Product News</h1>
+    <p class="lead">Fresh updates on launches, pricing shifts, and product trends from the SmartSaver desk.</p>
+</section>
+
+<section>
+    {% if categories %}
+        <div class="category-chips">
+            <a href="/news/" class="chip {% if not selected_category %}active{% endif %}">All News</a>
+            {% for cat in categories %}
+                <a href="/news/?category={{ cat.value }}" class="chip {% if selected_category == cat.value %}active{% endif %}">
+                    {{ cat.label }} <span class="count">({{ cat.count }})</span>
+                </a>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="news-grid">
+        {% for item in news_items %}
+            <article class="news-card">
+                <img src="{{ item.image_url }}" alt="{{ item.title }}">
+                <div>
+                    <p class="card-category">{{ item.get_news_category_display }} • {{ item.published_at|date:"M d, Y" }}</p>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.summary|truncatechars:160 }}</p>
+                    <a class="button-link" href="/news/{{ item.slug }}/">Read Story</a>
+                </div>
+            </article>
+        {% empty %}
+            <article class="news-card">
+                <div>
+                    <h3>No stories yet</h3>
+                    <p>Publish your first update from the backend and it will appear here automatically.</p>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+
+    {% if page_obj and paginator.num_pages > 1 %}
+        <nav class="pagination" aria-label="News pages">
+            {% if page_obj.has_previous %}
+                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}">Previous</a>
+            {% endif %}
+            {% for number in paginator.page_range %}
+                {% if number == page_obj.number %}
+                    <span class="page-link active">{{ number }}</span>
+                {% elif number >= page_obj.number|add:"-2" and number <= page_obj.number|add:"2" %}
+                    <a class="page-link" href="?page={{ number }}{% if selected_category %}&category={{ selected_category }}{% endif %}">{{ number }}</a>
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}">Next</a>
+            {% endif %}
+        </nav>
+    {% endif %}
+</section>
+{% endblock %}

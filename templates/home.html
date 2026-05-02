@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-panel">
+    <p class="eyebrow">Price comparison made practical</p>
+    <h1>Find the best deal and smart alternatives in seconds.</h1>
+    <p class="lead">Search one product and instantly compare prices across marketplaces with cost-saving alternatives highlighted.</p>
+
+    <form class="search-form" action="/results/" method="get">
+        <input type="text" name="q" placeholder="Search products, brands, categories" list="global-search-suggestions" data-autocomplete-list="global-search-suggestions" data-autocomplete-endpoint="/api/autocomplete/" required>
+        <input type="text" name="category" placeholder="Optional category">
+        <input type="text" name="brand" placeholder="Optional brand">
+        <button type="submit">Search Deals</button>
+    </form>
+    <datalist id="global-search-suggestions"></datalist>
+</section>
+
+<section>
+    <div class="section-head">
+        <h2>Featured today</h2>
+        <a href="/results/">See all products</a>
+    </div>
+    <div class="card-grid">
+        {% for product in featured_products %}
+            <article class="product-card">
+                <div class="product-image-wrap">
+                    {% if product.image_url %}
+                        <img src="{{ product.image_url }}" alt="{{ product.name }}" class="product-image">
+                    {% else %}
+                        <div class="product-image-placeholder">No image</div>
+                    {% endif %}
+                </div>
+                <div class="product-content">
+                    <p class="card-category">{{ product.category }}</p>
+                    <h3>{{ product.name }}</h3>
+                    <p class="card-brand">{{ product.brand }}</p>
+                    <p class="price-label">
+                        {% if product.cheapest_price %}
+                            From ${{ product.cheapest_price }} on {{ product.cheapest_platform }}
+                        {% else %}
+                            Price unavailable
+                        {% endif %}
+                    </p>
+                    <a class="button-link" href="/products/{{ product.id }}/">Open Product</a>
+                </div>
+            </article>
+        {% empty %}
+            <p>No products yet. Run the seed command to populate sample data.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<section>
+    <div class="section-head">
+        <h2>Daily product news</h2>
+        <a href="/news/">Read all news</a>
+    </div>
+    <div class="news-grid">
+        {% for item in latest_news %}
+            <article class="news-card">
+                <img src="{{ item.image_url }}" alt="{{ item.title }}">
+                <div>
+                    <p class="card-category">{{ item.published_at|date:"M d, Y" }}</p>
+                    <h3>{{ item.title }}</h3>
+                    <p>{{ item.summary|truncatechars:120 }}</p>
+                    <a class="button-link" href="/news/{{ item.slug }}/">Read Story</a>
+                </div>
+            </article>
+        {% empty %}
+            <p>No news published yet. Add stories from the admin backend.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
